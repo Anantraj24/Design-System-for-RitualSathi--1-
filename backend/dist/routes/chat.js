@@ -1,0 +1,50 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const geminiService_1 = require("../services/geminiService");
+const router = (0, express_1.Router)();
+/**
+ * POST /api/chat
+ * Handle chat messages and return AI responses
+ */
+router.post('/', async (req, res) => {
+    try {
+        const { message, history = [], userContext = {} } = req.body;
+        // Validate request
+        if (!message || typeof message !== 'string' || message.trim().length === 0) {
+            return res.status(400).json({
+                error: 'Message is required and must be a non-empty string',
+            });
+        }
+        // Validate history format
+        if (!Array.isArray(history)) {
+            return res.status(400).json({
+                error: 'History must be an array',
+            });
+        }
+        // Limit message length
+        if (message.length > 1000) {
+            return res.status(400).json({
+                error: 'Message is too long (max 1000 characters)',
+            });
+        }
+        // Limit history length to prevent token overflow
+        const limitedHistory = history.slice(-10); // Keep last 10 messages
+        // Get AI response
+        const reply = await (0, geminiService_1.getChatCompletion)(message, limitedHistory, userContext);
+        // Return response
+        return res.json({
+            reply,
+            timestamp: new Date().toISOString(),
+        });
+    }
+    catch (error) {
+        console.error('Chat endpoint error:', error);
+        // Return appropriate error
+        return res.status(500).json({
+            error: 'Sorry, Sathi Assistant is unavailable right now. Please try again.',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+        });
+    }
+});
+exports.default = router;
