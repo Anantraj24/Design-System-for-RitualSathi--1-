@@ -81,15 +81,5 @@
     "react-dom": {
       "optional": true
     }
-  },
-  "overrides": {
-    "rollup": "npm:@rollup/wasm-node",
-    "esbuild": "npm:esbuild-wasm@latest"
-  },
-  "pnpm": {
-    "overrides": {
-      "rollup": "npm:@rollup/wasm-node",
-      "esbuild": "npm:esbuild-wasm@latest"
-    }
   }
 }
