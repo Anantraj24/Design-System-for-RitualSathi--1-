@@ -91,7 +91,6 @@ export default function App() {
   useEffect(() => {
     const isAuthenticated = localStorage.getItem('isAuthenticated');
     if (isAuthenticated === 'true' && currentScreen === 'splash') {
-      // User is authenticated, skip to home after splash
       const timer = setTimeout(() => {
         setCurrentScreen('home');
       }, 2000);
@@ -99,7 +98,7 @@ export default function App() {
     }
   }, []);
 
-  // Auto-transition from splash to welcome after 2 seconds
+  // Auto-transition from splash to welcome
   useEffect(() => {
     if (currentScreen === 'splash') {
       const isAuthenticated = localStorage.getItem('isAuthenticated');
@@ -112,36 +111,34 @@ export default function App() {
     }
   }, [currentScreen]);
 
-  return (
-    <ThemeProvider>
-      <div className="size-full bg-[#FFFDF8] dark:bg-[#0F172A] overflow-hidden transition-colors duration-300">
-        {/* Mobile container - max width 428px for mobile view */}
-        <div className="h-full max-w-[428px] mx-auto bg-[#FFFDF8] dark:bg-[#0F172A] shadow-xl transition-colors duration-300">
-        {currentScreen === 'splash' && <SplashScreen />}
-
-        {currentScreen === 'welcome' && (
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'splash':
+        return <SplashScreen />;
+      case 'welcome':
+        return (
           <WelcomeScreen
             onGetStarted={() => setCurrentScreen('select-ceremony')}
             onLogin={() => setCurrentScreen('login')}
           />
-        )}
-
-        {currentScreen === 'login' && (
+        );
+      case 'login':
+        return (
           <LoginScreen
             onBack={() => setCurrentScreen('welcome')}
             onCreateAccount={() => setCurrentScreen('create-account')}
             onLogin={() => setCurrentScreen('home')}
           />
-        )}
-
-        {currentScreen === 'create-account' && (
+        );
+      case 'create-account':
+        return (
           <CreateAccountScreen
             onBack={() => setCurrentScreen('welcome')}
             onLogin={() => setCurrentScreen('login')}
           />
-        )}
-
-        {currentScreen === 'select-ceremony' && (
+        );
+      case 'select-ceremony':
+        return (
           <SelectCeremonyScreen
             onBack={() => setCurrentScreen('welcome')}
             onContinue={(ceremony) => {
@@ -149,9 +146,9 @@ export default function App() {
               setCurrentScreen('set-budget');
             }}
           />
-        )}
-
-        {currentScreen === 'set-budget' && (
+        );
+      case 'set-budget':
+        return (
           <SetBudgetScreen
             onBack={() => setCurrentScreen('select-ceremony')}
             onContinue={(budget) => {
@@ -159,9 +156,9 @@ export default function App() {
               setCurrentScreen('choose-city');
             }}
           />
-        )}
-
-        {currentScreen === 'choose-city' && (
+        );
+      case 'choose-city':
+        return (
           <ChooseCityScreen
             onBack={() => setCurrentScreen('set-budget')}
             onDone={(city) => {
@@ -169,9 +166,9 @@ export default function App() {
               setCurrentScreen('onboarding-complete');
             }}
           />
-        )}
-
-        {currentScreen === 'onboarding-complete' && (
+        );
+      case 'onboarding-complete':
+        return (
           <OnboardingCompleteScreen
             ceremony={onboardingData.ceremony}
             budget={onboardingData.budget}
@@ -181,9 +178,9 @@ export default function App() {
               setCurrentScreen('home');
             }}
           />
-        )}
-
-        {currentScreen === 'home' && (
+        );
+      case 'home':
+        return (
           <HomeScreen
             onCategoryClick={(categoryId, categoryName) => {
               setSelectedCategory({ id: categoryId, name: categoryName });
@@ -214,9 +211,9 @@ export default function App() {
               setCurrentScreen('notifications');
             }}
           />
-        )}
-
-        {currentScreen === 'category-listing' && selectedCategory && (
+        );
+      case 'category-listing':
+        return selectedCategory ? (
           <CategoryListingScreen
             categoryId={selectedCategory.id}
             categoryName={selectedCategory.name}
@@ -226,9 +223,9 @@ export default function App() {
               setCurrentScreen('niche-listing');
             }}
           />
-        )}
-
-        {currentScreen === 'niche-listing' && selectedCategory && selectedNiche && (
+        ) : null;
+      case 'niche-listing':
+        return selectedCategory && selectedNiche ? (
           <NicheListingScreen
             categoryId={selectedCategory.id}
             niche={selectedNiche}
@@ -239,14 +236,13 @@ export default function App() {
               setCurrentScreen('vendor-detail');
             }}
           />
-        )}
-
-        {currentScreen === 'vendor-detail' && selectedVendor && (
+        ) : null;
+      case 'vendor-detail':
+        return selectedVendor ? (
           <VendorDetailScreen
             vendor={selectedVendor}
             onBack={() => setCurrentScreen(previousScreen)}
             onBookNow={() => {
-              // Update booking data with selected vendor
               setBookingData({
                 ...bookingData,
                 vendorName: selectedVendor.name,
@@ -258,9 +254,9 @@ export default function App() {
               setCurrentScreen('booking-form');
             }}
           />
-        )}
-
-        {currentScreen === 'booking-form' && (
+        ) : null;
+      case 'booking-form':
+        return (
           <BookingFormScreen
             onBack={() => setCurrentScreen('vendor-detail')}
             onContinue={(data) => {
@@ -268,9 +264,9 @@ export default function App() {
               setCurrentScreen('booking-summary');
             }}
           />
-        )}
-
-        {currentScreen === 'booking-summary' && (
+        );
+      case 'booking-summary':
+        return (
           <BookingSummaryScreen
             onBack={() => setCurrentScreen('booking-form')}
             onEdit={() => setCurrentScreen('booking-form')}
@@ -280,36 +276,36 @@ export default function App() {
             }}
             bookingData={bookingData}
           />
-        )}
-
-        {currentScreen === 'upi-payment' && (
+        );
+      case 'upi-payment':
+        return (
           <UpiPaymentScreen
             onBack={() => setCurrentScreen('booking-summary')}
             onPaymentVerified={() => setCurrentScreen('payment-success-simple')}
           />
-        )}
-
-        {currentScreen === 'payment-success' && (
+        );
+      case 'payment-success':
+        return (
           <PaymentSuccessScreen
             onViewBooking={() => setCurrentScreen('my-bookings')}
             onGoHome={() => setCurrentScreen('home')}
           />
-        )}
-
-        {currentScreen === 'payment-success-simple' && (
+        );
+      case 'payment-success-simple':
+        return (
           <PaymentSuccessSimpleScreen
             onContinue={() => setCurrentScreen('booking-confirmed')}
           />
-        )}
-
-        {currentScreen === 'booking-confirmed' && (
+        );
+      case 'booking-confirmed':
+        return (
           <BookingConfirmedScreen
             onViewStatus={() => setCurrentScreen('booking-tracking')}
             onGoHome={() => setCurrentScreen('home')}
           />
-        )}
-
-        {currentScreen === 'my-bookings' && (
+        );
+      case 'my-bookings':
+        return (
           <MyBookingsScreen
             onViewStatus={(bookingId) => {
               console.log('View status for:', bookingId);
@@ -327,15 +323,15 @@ export default function App() {
               }
             }}
           />
-        )}
-
-        {currentScreen === 'booking-tracking' && (
+        );
+      case 'booking-tracking':
+        return (
           <BookingTrackingScreen
             onBack={() => setCurrentScreen('my-bookings')}
           />
-        )}
-
-        {currentScreen === 'budget-planner' && (
+        );
+      case 'budget-planner':
+        return (
           <BudgetPlannerScreen
             onNavigate={(tab) => {
               if (tab === 'home') {
@@ -349,9 +345,9 @@ export default function App() {
               }
             }}
           />
-        )}
-
-        {currentScreen === 'profile' && (
+        );
+      case 'profile':
+        return (
           <ProfileScreen
             onNavigate={(tab) => {
               if (tab === 'home') {
@@ -369,9 +365,9 @@ export default function App() {
               setCurrentScreen('chatbot');
             }}
           />
-        )}
-
-        {currentScreen === 'chatbot' && (
+        );
+      case 'chatbot':
+        return (
           <ChatbotScreen
             onBack={() => setCurrentScreen(previousScreen)}
             userContext={{
@@ -380,15 +376,15 @@ export default function App() {
               budget: onboardingData.budget,
             }}
           />
-        )}
-
-        {currentScreen === 'notifications' && (
+        );
+      case 'notifications':
+        return (
           <NotificationsScreen
             onBack={() => setCurrentScreen(previousScreen)}
           />
-        )}
-
-        {currentScreen === 'community' && (
+        );
+      case 'community':
+        return (
           <CommunityScreen
             onNavigate={(tab) => {
               if (tab === 'home') {
@@ -402,7 +398,17 @@ export default function App() {
               }
             }}
           />
-        )}
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <ThemeProvider>
+      <div className="w-screen h-screen bg-[#F5F4F0] dark:bg-[#090D16] flex items-center justify-center overflow-hidden transition-colors duration-300">
+        <div className="w-full h-full sm:max-w-[430px] sm:h-[92%] sm:rounded-[24px] sm:shadow-2xl bg-[#FFFDF8] dark:bg-[#0F172A] relative overflow-hidden device-content-container flex flex-col transition-all">
+          {renderScreen()}
         </div>
       </div>
     </ThemeProvider>
