@@ -406,7 +406,7 @@ export default function App() {
 
   return (
     <ThemeProvider>
-      <div className="w-screen h-screen bg-[#F5F4F0] dark:bg-[#090D16] flex items-center justify-center overflow-hidden transition-colors duration-300">
+      <div className="w-screen h-dvh bg-[#F5F4F0] dark:bg-[#090D16] flex items-center justify-center overflow-hidden transition-colors duration-300">
         <div className="w-full h-full sm:max-w-[430px] sm:h-[92%] sm:rounded-[24px] sm:shadow-2xl bg-[#FFFDF8] dark:bg-[#0F172A] relative overflow-hidden device-content-container flex flex-col transition-all">
           {renderScreen()}
         </div>
